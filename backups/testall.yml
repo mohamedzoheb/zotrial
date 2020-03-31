@@ -1,0 +1,23 @@
+---
+- hosts: all
+
+  tasks:
+   - name: Include vars
+     vars:
+       tomcat_version: 8.5.23
+       tomcat_permissions_production: True
+       tomcat_users:
+         - username: "tomcat-user"
+           password: "zippyops"
+           roles: " tomcat,admin,manager,manager-gui"
+     become: yes
+     with_items:
+          - zaxos.tomcat-ansible-role
+     when: ansible_os_family == "RedHat"
+   - name: Install tomcat
+     
+     with_items:
+          - tomcat
+     when: ansible_os_family == "Debian"
+    
+  

@@ -1,0 +1,68 @@
+---
+- hosts: 192.168.1.143
+  become: yes
+  become_method: sudo
+  tasks:
+  - name: Update
+    command: bash -lc "sudo apt-get update"
+  - name: install the Java Development Kit package
+    command: bash -lc "sudo apt-get install default-jdk -y"
+  - name: create a new tomcat group
+    command: bash -lc "sudo groupadd tomcat"
+    ignore_errors: yes
+  - name: create a new tomcat user
+    command: bash -lc "sudo useradd -s /bin/false -g tomcat -d /opt/tomcat tomcat"
+    ignore_errors: yes
+  #- name: Install Tomcat
+    #command: bash -lc "sudo cd /tmp && curl -O http://apache.mirrors.ionfish.org/tomcat/tomcat-8/v8.5.5/bin/apache-tomcat-8.5.5.tar.gz"
+    #get_url: url=http://archive.apache.org/dist/tomcat/tomcat-8/v8.5.8/bin/apache-tomcat-8.5.8.tar.gz dest=/opt/apache-tomcat-8.5.8.tar.gz
+  - name: tomcat dir
+    command: bash -lc "sudo mkdir /opt/tomcat"
+    ignore_errors: yes
+
+  - name: Download Tomcat
+    unarchive:
+      src: http://archive.apache.org/dist/tomcat/tomcat-8/v8.5.8/bin/apache-tomcat-8.5.8.tar.gz
+      dest: /opt/tomcat
+      mode: 0644
+      remote_src: yes
+    ignore_errors: yes
+
+  - name: Extract archive
+    command: chdir=/tmp /bin/tar xvf /opt/apache-tomcat-8.5.8.tar.gz -C /opt/ creates=/opt/tomcat
+
+
+    ignore_errors: yes
+  #- name: extract tar
+    #command: bash -lc "sudo mkdir /opt/tomcat && cd /tmp && sudo tar xzvf apache-tomcat-8*tar.gz -C /opt/tomcat --strip-components=1"
+    #ignore_errors: yes
+  - name: Update Permissions
+    command: bash -lc "sudo cd /opt/tomcat && sudo chgrp -R tomcat /opt/tomcat && sudo chmod -R g+r conf && sudo chmod g+x conf && sudo chown -R tomcat webapps/ work/ temp/ logs/"
+  - name: Create a systemd Service File
+    command: bash -lc "sudo echo JAVA_HOME="/usr/lib/jvm/java-8-oracle/jre" >> /etc/environment"
+    command: bash -lc "sudo echo "export JAVA_HOME=/usr/lib/jvm/java-8-oracle/jre" >> ~/.bashrc"
+    command: bash -lc "sudo echo "export PATH=$JAVA_HOME/bin:$PATH" >> ~/.bashrc"
+    command: bash -lc "sudo source ~/.bashrc"
+  - name: copy tomcat.service to /etc/systemd/system/
+    command: bash -lc "sudo cp /etc/ansible/workspace/java-app/try/templates/tomcat.service /etc/systemd/system/"
+  - name: reload the systemd daemon
+    command: bash -lc "sudo systemctl daemon-reload"
+  - name: Start the Tomcat service
+    command: bash -lc "sudo systemctl start tomcat"
+  - name: enable the service
+    command: bash -lc "sudo systemctl enable tomcat"
+  - name: copy tomcat-users.xml to /opt/tomcat/conf/
+    command: bash -lc "sudo cp /etc/ansible/workspace/java-app/try/templates/tomcat-users.xml /opt/tomcat/conf/"
+  - name: copy context.xml to /opt/tomcat/webapps/manager/META-INF/ and /opt/tomcat/webapps/host-manager/META-INF/
+    command: bash -lc "sudo cp /etc/ansible/workspace/java-app/try/templates/context.xml /opt/tomcat/webapps/manager/META-INF/"
+    command: bash -lc "sudo cp /etc/ansible/workspace/java-app/try/templates/context.xml /opt/tomcat/webapps/host-manager/META-INF/"
+  - name: restart the Tomcat service
+    command: bash -lc "sudo systemctl restart tomcat"
+  - name: Download war file from artifactory
+    become: yes
+    get_url:
+      url: "http://192.168.1.130:8081/artifactory/Ansible-Java-Sourcecode-POC/newapp-0.0.1-SNAPSHOT.war"
+      dest: "/opt/tomcat/webapps/"
+
+
+

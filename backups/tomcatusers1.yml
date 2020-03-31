@@ -1,0 +1,7 @@
+- hosts: win
+
+  tasks:
+    - name: Copy a single file
+      win_copy:
+        src: '/home/ansible/tomcat-users.xml'
+        dest: 'C:\Program Files\Apache Software Foundation\tomcat\apache-tomcat-8.5.12\conf\tomcat-users.xml'

@@ -1,0 +1,18 @@
+---
+- hosts: all
+  become_user: root
+  become: yes
+  tasks: 
+
+  - name: tomcat
+    yum: name=tomcat state=latest
+  - name: tomcat-webapps
+    yum: name=tomcat-webapps state=latest
+  - name: admin webapps
+    yum: name=tomcat-admin-webapps state=latest
+  - name: start tomcat
+    service: name=tomcat enabled=yes state=started
+
+ 
+
+

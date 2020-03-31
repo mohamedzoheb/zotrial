@@ -1,0 +1,7 @@
+- hosts: win
+  
+  tasks:
+    - name: Download war file from artifactory
+      win_get_url:
+        url: 'http://192.168.1.130:8081/artifactory/java-app/java-sample-app-1.0.0.war'
+        dest: 'C:\Program Files\Apache Software Foundation\tomcat\apache-tomcat-8.5.12\webapps\java-sample-app-1.0.0.war'

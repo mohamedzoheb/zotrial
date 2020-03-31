@@ -1,0 +1,73 @@
+---
+- hosts: all
+  become_user: root
+  become: yes
+  tasks: 
+
+  - name: tomcat
+    yum: name=tomcat state=latest
+    when: ansible_os_family == "RedHat"
+  - name: tomcat-webapps
+    yum: name=tomcat-webapps state=latest
+    when: ansible_os_family == "RedHat"
+  - name: admin webapps
+    yum: name=tomcat-admin-webapps state=latest
+    when: ansible_os_family == "RedHat"
+  - name: start tomcat
+    service: name=tomcat enabled=yes state=started
+    when: ansible_os_family == "RedHat"
+  - name: Configure Tomcat users
+    template: src=tomcat-users.xml dest=/usr/share/tomcat/conf
+    when: ansible_os_family == "RedHat"
+  - name: send war to centos node
+    get_url:
+      url: "http://192.168.1.130:8081/artifactory/Ansible-Java-Sourcecode-POC/java-sample-app-1.0.0.war" 
+      dest: "/usr/share/tomcat/webapps"
+    when: ansible_os_family == "RedHat"
+  - name: restart tomcat
+    service: name=tomcat enabled=yes state=restarted    
+    when: ansible_os_family == "RedHat"
+  - name: tomcat8
+    apt: name=tomcat8 state=latest
+    when: ansible_os_family == "Debian"
+  - name: tomcat8-docs
+    apt: name=tomcat8-docs state=latest
+    when: ansible_os_family == "Debian"
+  - name: tomcat8 examples
+    apt: name=tomcat8-examples state=latest
+    when: ansible_os_family == "Debian"
+  - name: tomcat8 admin
+    apt: name=tomcat8-admin state=latest
+    when: ansible_os_family == "Debian"
+  - name: start tomcat8
+    service: name=tomcat8 enabled=yes state=started
+    when: ansible_os_family == "Debian"
+  - name: restart tomcat8
+    service: name=tomcat8 enabled=yes state=restarted
+    when: ansible_os_family == "Debian"
+  - name: Configure Tomcat users
+    template: src=tomcat-users.xml dest=/var/lib/tomcat8/conf/tomcat-users.xml
+    when: ansible_os_family == "Debian"
+  - name: send war to ubuntu node
+    get_url:
+      url: "http://192.168.1.130:8081/artifactory/Ansible-Java-Sourcecode-POC/java-sample-app-1.0.0.war" 
+      dest: "/var/lib/tomcat8/webapps"
+    when: ansible_os_family == "Debian"
+
+
+  - name: windows
+    win_chocolatey:
+      name: tomcat
+      state: present
+    when: ansible_os_family == "Windows"
+  - name: copy
+    win_copy: 
+      src: '/etc/ansible/templates/tomcat-users.xml'
+      dest: 'C:\Program Files\Apache Software Foundation\tomcat\apache-tomcat-8.5.12\conf\tomcat-users.xml'
+    when: ansible_os_family == "Windows"
+
+  - name: Download war file from artifactory 
+    win_get_url:
+      url: 'http://192.168.1.130:8081/artifactory/Ansible-Java-Sourcecode-POC/java-sample-app-1.0.0.war'
+      dest: 'C:\Program Files\Apache Software Foundation\tomcat\apache-tomcat-8.5.12\webapps\java-sample-app-1.0.0.war'
+    when: ansible_os_family == "Windows"

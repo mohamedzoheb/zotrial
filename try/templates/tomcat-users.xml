@@ -1,0 +1,3 @@
+<tomcat-users . . .>
+    <user username="tomcat-user" password="zippyops" roles="manager-gui,admin-gui"/>
+</tomcat-users>

@@ -1,0 +1,26 @@
+---
+- hosts: ubuntu
+  become: yes
+  become_method: sudo
+  tasks:
+  - name: Update
+    command: bash -lc "sudo apt-get update"
+  - name: install the Java Development Kit package
+    command: bash -lc "sudo apt-get install default-jdk"
+  - name: create a new tomcat group
+    command: bash -lc "sudo groupadd tomcat"
+  - name: create a new tomcat user
+    command: bash -lc "sudo useradd -s /bin/false -g tomcat -d /opt/tomcat tomcat"
+  - name: Install Tomcat
+    command: bash -lc "sudo cd /tmp && curl -O http://apache.mirrors.ionfish.org/tomcat/tomcat-8/v8.5.5/bin/apache-tomcat-8.5.5.tar.gz"
+    command: bash -lc "sudo mkdir /opt/tomcat && sudo tar xzvf apache-tomcat-8*tar.gz -C /opt/tomcat --strip-components=1"
+  - name: Update Permissions
+    command: bash -lc "sudo cd /opt/tomcat && sudo chgrp -R tomcat /opt/tomcat && sudo chmod -R g+r conf && sudo chmod g+x conf && sudo chown -R tomcat webapps/ work/ temp/ logs/"
+  - name: Create a systemd Service File
+    command: bash -lc "sudo echo JAVA_HOME="/usr/lib/jvm/java-8-oracle/jre" >> /etc/environment"
+    command: bash -lc "sudo echo "export JAVA_HOME=/usr/lib/jvm/java-8-oracle/jre" >> ~/.bashrc"
+    command: bash -lc "sudo echo "export PATH=$JAVA_HOME/bin:$PATH" >> ~/.bashrc"
+    command: bash -lc "sudo source ~/.bashrc"
+  - name: 
+
+

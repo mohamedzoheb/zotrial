@@ -1,0 +1,18 @@
+---
+- import_playbook: tasks/tomcatcentos.yml
+- import_playbook: tasks/tomcatwindows.yml
+#- import_playbook: tasks/tomcatubuntu.yml
+#- import_playbook: tasks/tomcatusers.yml
+#- import_playbook: tasks/remote_file.yml
+
+#- hosts: all
+#tasks file for java
+#tasks:
+#- import_playbook: tasks/tomcatcentos.yml
+#when: ansible_os_family == "RedHat"
+#- include_tasks: tasks/tomcatubuntu.yml
+#when: ansible_os_family == "Debian"
+#- include_tasks: tasks/tomcatwindows.yml
+#when: ansible_os_family == "Windows"
+#- include_tasks: tasks/tomcatusers.yml
+#- include_tasks: tasks/remote_file.yml
